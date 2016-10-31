@@ -1,43 +1,64 @@
 % This script will display the video stream and record the images and
 % kinematic at a given time using mouse clicks
 
-counter = 1;
+% rosrun image_view image_view image:=/stereo/left/image_rect_color
+
 
 foldername = datestr(now, 'dd-mmm-HH-MM-SS');
 mkdir(foldername);
 
-while (1)
+% declare topic names and create subscribers
+leftImageTopic = '/stereo/left/image_rect_color/compressed';
+rightImageTopic = '/stereo/right/image_rect_color/compressed';
+transformTopic = '/dvrk/PSM2/position_cartesian_current';
+
+subL = rossubscriber(leftImageTopic);
+subR = rossubscriber(rightImageTopic);
+subT = rossubscriber(transformTopic);
+
+n_images = 9;
+for counter = 1:n_images
     
     
     k = waitforbuttonpress;
-
-% declare topic names
-    leftImageTopic = '';
-    rightImageTopic = '';
-    kinematicsTopic = '';
     
-% fetch images 
-
-imgL = readImage(msg);
-imgR = readImage(msg);
-
-% fetch 4x4 transformation matrix
-
-%TODO store in a time stamped file
-
-% save images and transform matrix
-    filenameL = strcat(foldername, int2str(counter), 'L');
-    filenameR = strcat(foldername, int2str(counter), 'R');
-    filenameTf = strcat(foldername, int2str(counter), 'T.mat');
-
-
+    % fetch images
+    msgL = receive(subL);
+    msgR = receive(subR);
+    
+    imgL = readImage(msgL);
+    imgR = readImage(msgR);
+    
+    % fetch 4x4 transformation matrix
+    msgT = receive(subT, 1); % second value is timeout
+    
+    % gen filesnames
+    filenameL = strcat(foldername, '/', int2str(counter), 'L.jpg');
+    filenameR = strcat(foldername, '/', int2str(counter), 'R.jpg');
+    filenameT = strcat(foldername, '/', int2str(counter), 'T.mat');
+    
+    % save images
     imwrite(imgL, filenameL);
     imwrite(imgR, filenameR);
-    save(filenameTf,'Tf');
+    
+    % get PoseStamped message and extract deets
+    rosPosition = msgT.Pose.Position;
+    rosQuaternion = msgT.Pose.Orientation;
+    
+    quaternion = [rosQuaternion.W rosQuaternion.X rosQuaternion.Y rosQuaternion.Z];
+    position = [rosPosition.X rosPosition.Y rosPosition.Z];
+    
+    rotm = quat2rotm(quaternion);
+    
+    % generate 6d0f transform matrix
+    T = zeros(4,4);
+    T(1:3, 1:3) = rotm;
+    T(1:3, end) = position;
+    
+    
+    % save transform matrix
+    save(filenameT,'T');
     
     disp('image+transform saved');
-    
-% increment counter
-    counter = counter + 1;
-    
+        
 end
