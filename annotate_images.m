@@ -1,14 +1,14 @@
 % This script opens the image files, shows them side by side and allows
 % user to annotate pics
 
-n_images = 2;
 matchedPointsL = zeros(n_images,2);
 matchedPointsR = zeros(n_images,2);
 
+n_images = 9;
 for counter = 1:n_images
     
-    filenameImgL = strcat(int2str(counter), 'L');
-    filenameImgR = strcat(int2str(counter), 'R');
+    filenameImgL = strcat(int2str(counter), 'L.jpg');
+    filenameImgR = strcat(int2str(counter), 'R.jpg');
     
     I = imread(filenameImgL);
     imshow(I);

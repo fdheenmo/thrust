@@ -1,0 +1,49 @@
+% This script will display the video stream and record the images and
+% kinematic at a given time using mouse clicks
+
+counter = 1;
+
+foldername = datestr(now, 'dd-mmm-HH-MM-SS');
+mkdir(foldername);
+
+% declare topic names and create subscribers
+leftImageTopic = '/stereo/left/image_rect_color/compressed';
+rightImageTopic = '/stereo/right/image_rect_color/compressed';
+kinematicsTopic = '';
+
+subL = rossubscriber(leftImageTopic);
+subR = rossubscriber(rightImageTopic);
+
+
+while (1)
+    
+    
+    k = waitforbuttonpress;
+    
+    
+    % fetch images
+    msgL = receive(subL);
+    msgR = receive(subR);
+    imgL = readImage(msgL);
+    imgR = readImage(msgR);
+    
+    % fetch 4x4 transformation matrix
+    
+    %TODO store in a time stamped file
+    
+    % save images and transform matrix
+    filenameL = strcat(foldername, int2str(counter), 'L.jpg');
+    filenameR = strcat(foldername, int2str(counter), 'R.jpg');
+    filenameTf = strcat(foldername, int2str(counter), 'T.mat');
+    
+    
+    imwrite(imgL, filenameL);
+    imwrite(imgR, filenameR);
+%     save(filenameTf,'Tf');
+    
+    disp('image+transform saved');
+    
+    % increment counter
+    counter = counter + 1;
+    
+end
