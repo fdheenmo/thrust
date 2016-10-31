@@ -2,6 +2,10 @@
 % kinematic at a given time using mouse clicks
 
 counter = 1;
+
+foldername = datestr(now, 'dd-mmm-HH-MM-SS');
+mkdir(foldername);
+
 while (1)
     
     
@@ -22,9 +26,9 @@ imgR = readImage(msg);
 %TODO store in a time stamped file
 
 % save images and transform matrix
-    filenameL = strcat(int2str(counter), 'L');
-    filenameR = strcat(int2str(counter), 'R');
-    filenameTf = strcat(int2str(counter), 'T.mat');
+    filenameL = strcat(foldername, int2str(counter), 'L');
+    filenameR = strcat(foldername, int2str(counter), 'R');
+    filenameTf = strcat(foldername, int2str(counter), 'T.mat');
 
 
     imwrite(imgL, filenameL);
