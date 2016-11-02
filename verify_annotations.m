@@ -7,23 +7,48 @@ matchedPointsL = zeros(n_images,2);
 matchedPointsR = zeros(n_images,2);
 
 foldername = 'current_images/';
+saveFile = strcat(foldername, 'matchedPoints.mat');
+load(saveFile);
 
+radius = 5;
 
 for counter = 1:n_images
     
     filenameImgL = strcat(foldername, int2str(counter), 'L.jpg');
     filenameImgR = strcat(foldername, int2str(counter), 'R.jpg');
     
+    
     I = imread(filenameImgL);
     imshow(I);
-    [xl, yl] = ginput(1);
-    matchedPointsL(counter, :) = [xl, yl];
+    hold on;
+    P = matchedPointsL(counter, :);
+    xl = P(1);
+    yl = P(2);
     
+    t=0:0.1:2*pi;
+    %x_o and y_o = center of circle
+    x = xl + radius*sin(t);
+    y = yl + radius*cos(t);
+    plot(x,y,'r');
+    hold off;
+    
+    k = waitforbuttonpress;
     
     I = imread(filenameImgR);
     imshow(I);
-    [xr, yr] = ginput(1);
-    matchedPointsR(counter, :) = [xr, yr];
+    hold on;
+    P = matchedPointsR(counter, :);
+    xr = P(1);
+    yr = P(2);
+    x = xr + radius*sin(t);
+    y = yr + radius*cos(t);
+    plot(x,y,'r');
+    hold off;
+    
+    
+    
+    k = waitforbuttonpress;
+    
     
     disp('One pair of images done');
     
@@ -31,5 +56,4 @@ for counter = 1:n_images
 end
 
 % save all the 2D points
-saveFile = strcat(foldername, 'matchedPoints.mat');
-save('matchedPoints.mat','matchedPointsL', 'matchedPointsR');
+
