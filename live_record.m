@@ -16,7 +16,7 @@ subL = rossubscriber(leftImageTopic);
 subR = rossubscriber(rightImageTopic);
 subT = rossubscriber(transformTopic);
 
-n_images = 9;
+n_images = 30;
 for counter = 1:n_images
     
     
@@ -54,6 +54,7 @@ for counter = 1:n_images
     T = zeros(4,4);
     T(1:3, 1:3) = rotm;
     T(1:3, end) = position;
+    T(4,4) = 1;
     
     
     % save transform matrix

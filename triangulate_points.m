@@ -1,6 +1,8 @@
 % reads corresponding_points.at file and does stuff
 
-load('matchedPoints.mat')
+foldername = 'current_images/';
+saveFile = strcat(foldername, 'matchedPoints.mat');
+load(saveFile)
 
 % cameraMatrix1 - camera projection matrix?
 
@@ -18,4 +20,4 @@ cameraMatrixr = ...
 
 triangulatedPoints = triangulate(matchedPointsL,matchedPointsR,cameraMatrixl',cameraMatrixr');
 
-save('triangulatedPoints.mat', 'triangulatedPoints');
+save(strcat(foldername,'triangulatedPoints.mat'), 'triangulatedPoints');
