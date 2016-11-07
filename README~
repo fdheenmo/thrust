@@ -1,0 +1,9 @@
+Step 1: Record data
+Run live_record.m to store files
+Step 2: Copy files from inside the timestamped folder
+
+Step 3: annotate_images
+Step 4: verify_annotations
+
+Step 5: compute_transform - does least squares computation to determine Tf between camera frame and robot frame
+Step 6: verify_transform - Projects the 3D point back into RL camera frames using Tf computed above
