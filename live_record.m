@@ -60,6 +60,7 @@ for counter = 1:n_images
     % save transform matrix
     save(filenameT,'T');
     
-    disp('image+transform saved');
+    fprintf('image+transform saved. %d images left', n_images-counter);
         
 end
+fprintf('%d images saved', n_images);
