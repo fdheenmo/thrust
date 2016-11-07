@@ -36,3 +36,5 @@ end
 Tf(1:3, :) = Tf(1:3, :) ./ n_images;
 
 %% calc error
+
+e = error_function(P_robot, P_cam, Tf, n_images)

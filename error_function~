@@ -1,0 +1,5 @@
+function e = error_function(P_robot, P_cam, Tf)
+
+predicted = P_robot + Tf; 
+dx = P_robot
+end
