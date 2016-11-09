@@ -13,4 +13,7 @@ cameraMatrixR = ...
 foldername = 'current_images/';
 
 
-save('config_file.mat', 'n_stereo_pairs', 'cameraMatrixL', 'cameraMatrixR');
+save('config_file.mat', 'n_stereo_pairs', 'cameraMatrixL', 'cameraMatrixR', ...
+    'foldername');
+
+clc; close all;

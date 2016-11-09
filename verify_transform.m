@@ -1,8 +1,9 @@
 % paste the computed transform here. replay on a set of test images
 % open all images and the T from kinematics
-clc; clear all
 
-Tf = [0.028578350506173345; -0.03719362261467788; -0.04935510520036327];
+% transform doesnt make sense
+Tf = [0.022543205159153114; -0.0349051211381397; -0.0434180850211258];
+
 
 load('config_file.mat')
 

@@ -2,6 +2,7 @@
 % kinematic at a given time using mouse clicks
 
 % rosrun image_view image_view image:=/stereo/left/image_rect_color
+load('config_file.mat')
 
 
 foldername = datestr(now, 'dd-mmm-HH-MM-SS');
@@ -16,9 +17,7 @@ subL = rossubscriber(leftImageTopic);
 subR = rossubscriber(rightImageTopic);
 subT = rossubscriber(transformTopic);
 
-n_images = 30;
-
-for counter = 1:n_images
+for counter = 1:n_stereo_pairs
     
     
     k = waitforbuttonpress;
@@ -61,8 +60,8 @@ for counter = 1:n_images
     % save transform matrix
     save(filenameT,'T');
     
-    fprintf('image+transform saved. %d images left\n', n_images-counter);
+    fprintf('image+transform saved. %d images left\n', n_stereo_pairs-counter);
         
 end
-fprintf('\n%d images saved!\n', n_images);
+fprintf('\n%d images saved!\n', n_stereo_pairs);
 close all;

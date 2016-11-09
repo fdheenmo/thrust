@@ -1,8 +1,11 @@
 function e = error_function(Tf)
-load dataset
+
+load('config_file.mat');
+load('optimization_dataset.mat');
 Tf = [Tf;1];
+
 % NOT HOMOGENOUS
-replicatedTf = repmat(Tf, 1, n_images);
+replicatedTf = repmat(Tf, 1, n_stereo_pairs);
 
 predicted_P_cam = P_robot + replicatedTf;
 

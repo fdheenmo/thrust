@@ -1,14 +1,11 @@
 % compute least squares
 
-clc; clear all
-
-
-foldername = 'current_images/';
-filename = strcat(foldername,'triangulatedPoints.mat');
-load(filename);
+clc; clear all;
 
 load('config_file.mat')
 
+filename = strcat(foldername,'triangulatedPoints.mat');
+load(filename);
 
 P_cam = zeros(4, n_stereo_pairs);
 P_cam(4,:) = 1;
@@ -28,7 +25,9 @@ end
 
 % set up an optimization problem with 9 variables.
 
-%%
+save('optimization_dataset.mat', 'P_robot', 'P_cam');
+
+%% Compute average for a starting point for optimization
 Tf = zeros(4, 1);
 Tf(4,:) = 1;
 for counter = 1:n_stereo_pairs
