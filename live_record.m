@@ -16,7 +16,7 @@ subL = rossubscriber(leftImageTopic);
 subR = rossubscriber(rightImageTopic);
 subT = rossubscriber(transformTopic);
 
-n_images = 50;
+n_images = 1;
 
 for counter = 1:n_images
     
@@ -64,4 +64,5 @@ for counter = 1:n_images
     fprintf('image+transform saved. %d images left\n', n_images-counter);
         
 end
-fprintf('\n\n%d images saved!', n_images);
+fprintf('\n%d images saved!\n', n_images);
+close all;
