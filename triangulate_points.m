@@ -8,7 +8,11 @@ load('config_file.mat')
 
 
 %%
+% use ROS parame
+% triangulatedPoints = triangulate(matchedPointsL,matchedPointsR,cameraMatrixL',cameraMatrixR');
 
-triangulatedPoints = triangulate(matchedPointsL,matchedPointsR,cameraMatrixL',cameraMatrixR');
+% use params from matlab
+triangulatedPoints = triangulate(matchedPointsL,matchedPointsR, stereoParams);
+
 
 save(strcat(foldername,'triangulatedPoints.mat'), 'triangulatedPoints');
