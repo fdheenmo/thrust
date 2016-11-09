@@ -32,4 +32,4 @@ end
 
 % save all the 2D points
 saveFile = strcat(foldername, 'matchedPoints.mat');
-save('matchedPoints.mat','matchedPointsL', 'matchedPointsR');
+save(saveFile,'matchedPointsL', 'matchedPointsR');

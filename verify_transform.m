@@ -2,30 +2,17 @@
 % open all images and the T from kinematics
 clc; clear all
 
-Tf = [-0.0310812333748081;0.0417728684476922;0.0636546382443061;1];
+Tf = [0.028578350506173345; -0.03719362261467788; -0.04935510520036327];
 
-
-Tf = [0.025013103324925536; -0.037918691033665575; -0.051348798036702024];
-
-cameraMatrixL = ...
-[572.2248516229374, 0, 378.7735080718994 -35.44749952807783;
-    0, 572.2248516229374, 239.291540145874, 0;
-    0, 0, 1, 0];
-
-cameraMatrixR = ...
-[572.2248516229374, 0, 378.7735080718994, 0;
-    0, 572.2248516229374, 239.291540145874, 0; 
-    0, 0, 1, 0];
-
+load('config_file.mat')
 
 foldername = 'test_images/';
 
-n_images = 30;
 t=0:0.1:2*pi;
 radius = 5;
 
 
-for counter = 1:n_images
+for counter = 1:n_stereo_pairs
     
     filenameImgL = strcat(foldername, int2str(counter), 'L.jpg');
     filenameImgR = strcat(foldername, int2str(counter), 'R.jpg');
@@ -43,8 +30,11 @@ for counter = 1:n_images
     P_cam(4) = 1;
     
     % now convert P_cam back into the L and R frame
-    pixelL = cameraMatrixL * P_cam'
-    pixelR = cameraMatrixR * P_cam'
+    pixelL = cameraMatrixL * P_cam';
+    pixelR = cameraMatrixR * P_cam';
+    
+    pixelL = pixelL ./ pixelL(3)
+    pixelR = pixelR ./ pixelR(3)
     
     
     I = imread(filenameImgL);

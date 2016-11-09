@@ -16,7 +16,7 @@ subL = rossubscriber(leftImageTopic);
 subR = rossubscriber(rightImageTopic);
 subT = rossubscriber(transformTopic);
 
-n_images = 1;
+n_images = 30;
 
 for counter = 1:n_images
     

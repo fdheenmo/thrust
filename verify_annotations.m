@@ -1,18 +1,18 @@
 % This script opens the image files, shows them side by side and allows
 % user to annotate pics
-n_images = 30;
+
+load('config_file.mat')
+
+matchedPointsL = zeros(n_stereo_pairs,2);
+matchedPointsR = zeros(n_stereo_pairs,2);
 
 
-matchedPointsL = zeros(n_images,2);
-matchedPointsR = zeros(n_images,2);
-
-foldername = 'current_images/';
 saveFile = strcat(foldername, 'matchedPoints.mat');
 load(saveFile);
 
 radius = 5;
 
-for counter = 1:n_images
+for counter = 1:n_stereo_pairs
     
     filenameImgL = strcat(foldername, int2str(counter), 'L.jpg');
     filenameImgR = strcat(foldername, int2str(counter), 'R.jpg');

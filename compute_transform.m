@@ -7,15 +7,16 @@ foldername = 'current_images/';
 filename = strcat(foldername,'triangulatedPoints.mat');
 load(filename);
 
-n_images = 30;
+load('config_file.mat')
 
-P_cam = zeros(4, n_images);
+
+P_cam = zeros(4, n_stereo_pairs);
 P_cam(4,:) = 1;
-P_robot = zeros(4, n_images);
+P_robot = zeros(4, n_stereo_pairs);
 P_robot(4,:) = 1;
 
 
-for counter = 1:n_images
+for counter = 1:n_stereo_pairs
     
     filenameImgT = strcat(foldername, int2str(counter), 'T.mat');
     load(filenameImgT);
@@ -30,11 +31,11 @@ end
 %%
 Tf = zeros(4, 1);
 Tf(4,:) = 1;
-for counter = 1:n_images
+for counter = 1:n_stereo_pairs
     Tf(1:3) = Tf(1:3) + P_robot(1:3, counter) - P_cam(1:3, counter);
 end
-Tf(1:3, :) = Tf(1:3, :) ./ n_images;
+Tf(1:3, :) = Tf(1:3, :) ./ n_stereo_pairs;
 
 %% calc error
 
-e = error_function(P_robot, P_cam, Tf, n_images)
+e = error_function(P_robot, P_cam, Tf, n_stereo_pairs)
