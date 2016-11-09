@@ -19,7 +19,15 @@ for counter = 1:n_stereo_pairs
     load(filenameImgT);
     
     P_cam(1:3, counter) = triangulatedPoints(counter, :);
-    P_robot(1:3, counter) = T(1:3, 4)';
+    P_tool_center_robot = T(1:3, 4)';
+    
+    horizontal_Tf = eye(4);
+    horizontal_Tf(1,4) = 0.009; % measured from center of the circle as 9mm
+    % note above transform will change
+    
+    P_robot(1:3, counter) = horizontal_Tf * P_tool_center_robot;
+    
+    % TODO add transformation
 end
 % we have one 3D point, and one 6DOF point. FIGHT!
 
