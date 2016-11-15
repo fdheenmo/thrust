@@ -1,5 +1,4 @@
-% paste the computed transform here. replay on a set of test images
-% open all images and the T from kinematics
+% verify transform and compute error
 
 clc; clear variables; close all;
 
@@ -28,7 +27,7 @@ for counter = 1:n_stereo_pairs
     % this is the tool-axis
     P_tool_center = P(1:3, 4);
     P_tool_center(4) = 1;
-
+    
     
     tooltip_transform = eye(4);
     
@@ -39,7 +38,7 @@ for counter = 1:n_stereo_pairs
     
     % this is the tool-tip
     P_robot(1:3) = transformed_point(1:3);
-
+    
     
     % transform point from robot to camera frame
     P_cam(1:3) = R * P_robot(1:3)' + t(1:3);
@@ -92,8 +91,10 @@ for counter = 1:n_stereo_pairs
         hold off;
         k = waitforbuttonpress;
         
-        disp('One pair of images done');
+        fprintf('One image pair annotated. %d image pairs left\n', n_stereo_pairs-counter);
+        
     end
+    
     
 end
 
