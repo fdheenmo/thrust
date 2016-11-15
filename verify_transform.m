@@ -1,6 +1,8 @@
 % paste the computed transform here. replay on a set of test images
 % open all images and the T from kinematics
 
+clc; clear variables; close all;
+
 load('computed_transform.mat')
 load('config_file.mat')
 
@@ -25,20 +27,22 @@ for counter = 1:n_stereo_pairs
     
     % this is the tool-axis
     P_tool_center = P(1:3, 4);
+    P_tool_center(4) = 1;
+
     
     tooltip_transform = eye(4);
     
     % change z access - m
     tooltip_transform(3,4) = tooltip_offset;
     
-    transformed_point = tooltip_transform * P_tool_center';
+    transformed_point = tooltip_transform * P_tool_center;
     
     % this is the tool-tip
     P_robot(1:3) = transformed_point(1:3);
 
     
     % transform point from robot to camera frame
-    P_cam(1:3) = R * P_robot(1:3) + t(1:3);
+    P_cam(1:3) = R * P_robot(1:3)' + t(1:3);
     P_cam(4) = 1;
     
     error = pdist2(triangulatedPoints(counter, :), P_cam(1:3));
@@ -96,3 +100,4 @@ end
 mean_error = sum_error / n_stereo_pairs;
 fprintf('Mean error = %d\n', mean_error);
 
+close all;

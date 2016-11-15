@@ -26,6 +26,8 @@ When computing transform, just use all the files in the folder which have same n
 Add the displacement into the equation
 Validate transform
 Fix colorbalance
+Easier way to collect data.
+Modular way to annotate or retake annotations without discarding entire 
 
 MISSING BLOCKS:
 correct Least squares

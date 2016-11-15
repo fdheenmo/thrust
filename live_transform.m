@@ -23,24 +23,31 @@ while 1
     imgR = readImage(msgR);
     
     % get PoseStamped message and extract deets
-    rosPosition = msgP.Pose.Position;   
-    position = [rosPosition.X rosPosition.Y rosPosition.Z];
+    rosPosition = msgP.Pose.Position;
+    rosQuaternion = msgP.Pose.Orientation;
+
+    positionVector = [rosPosition.X rosPosition.Y rosPosition.Z];
+
+    quaternion = [rosQuaternion.W rosQuaternion.X rosQuaternion.Y rosQuaternion.Z];    
+    rotationMatrix = quat2rotm(quaternion);
+        
+    % generate 6d0f transform matrix
+    P_tool_center = zeros(4,4);
+    P_tool_center(1:3, 1:3) = rotationMatrix;
+    P_tool_center(1:3, end) = positionVector;
+    P_tool_center(4,4) = 1;
     
-    % generate 3d0f position vector
-    P_tool_center_robot = zeros(4,1);
-    P_tool_center_robot(4,1) = 1;
-    
-    P_tool_center_robot(1:3, 1) = position;
-    
-    horizontal_Tf = eye(4);
-    horizontal_Tf(3,4) = 0.009; % measured from center of the circle as 9mm
+    tooltip_transform = eye(4);
+    tooltip_transform(3,4) = tooltip_offset; % measured from center of the circle as 9mm
     % NOTE: above transform will change
     
-    transformed_point = horizontal_Tf * P_tool_center_robot;
+    transformed_pose = tooltip_transform * P_tool_center;
     
-       
+    P_robot = transformed_pose(1:3,4);
+    
+    
     % transform point
-    P_cam(1:3) = R * transformed_point(1:3) + t(1:3);
+    P_cam(1:3) = R * P_robot(1:3) + t(1:3);
     P_cam(4) = 1;
     
     % now convert P_cam back into the L and R frame

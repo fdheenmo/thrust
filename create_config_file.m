@@ -1,6 +1,6 @@
 clc; clear variables; close all;
 
-n_stereo_pairs = 30;
+n_stereo_pairs = 50;
 
 % stereo parameters
 
