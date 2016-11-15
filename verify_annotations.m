@@ -1,16 +1,17 @@
 % This script opens the image files, shows them side by side and allows
 % user to annotate pics
 
+clc; clear variables; close all;
+
 load('config_file.mat')
 
-saveFile = strcat(foldername, 'matchedPoints.mat');
+saveFile = strcat(currentFoldername, 'matchedPoints.mat');
 load(saveFile);
 
 for counter = 1:n_stereo_pairs
     
-    filenameImgL = strcat(foldername, int2str(counter), 'L.jpg');
-    filenameImgR = strcat(foldername, int2str(counter), 'R.jpg');
-    
+    filenameImgL = strcat(currentFoldername, int2str(counter), '_L.jpg');
+    filenameImgR = strcat(currentFoldername, int2str(counter), '_R.jpg');
     
     I = imread(filenameImgL);
     imshow(I);
@@ -19,10 +20,9 @@ for counter = 1:n_stereo_pairs
     xl = P(1);
     yl = P(2);
     
-    t=0:0.1:2*pi;
     %x_o and y_o = center of circle
-    x = xl + r_plot*sin(t);
-    y = yl + r_plot*cos(t);
+    x = xl + r_plot*sin(t_plot);
+    y = yl + r_plot*cos(t_plot);
     fill(x,y,'r');
     hold off;
     
@@ -34,20 +34,14 @@ for counter = 1:n_stereo_pairs
     P = matchedPointsR(counter, :);
     xr = P(1);
     yr = P(2);
-    x = xr + r_plot*sin(t);
-    y = yr + r_plot*cos(t);
+    x = xr + r_plot*sin(t_plot);
+    y = yr + r_plot*cos(t_plot);
     fill(x,y,'r');
-    hold off;
-    
-    
+    hold off;   
     
     k = waitforbuttonpress;
     
-    
-    disp('One pair of images done');
-    
-    
+    fprintf('One image pair verified. %d image pairs left\n', n_stereo_pairs-counter);
 end
 
-% save all the 2D points
-
+close all;

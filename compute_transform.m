@@ -1,10 +1,10 @@
 % compute least squares
 
-clc; clear all;
+clc; clear variables; close all;
 
 load('config_file.mat')
 
-filename = strcat(foldername,'triangulatedPoints.mat');
+filename = strcat(currentFoldername,'triangulatedPoints.mat');
 load(filename);
 
 P_cam = zeros(n_stereo_pairs, 3);
@@ -12,23 +12,25 @@ P_robot = zeros(n_stereo_pairs, 3);
 
 for counter = 1:n_stereo_pairs
     
-    filenameImgT = strcat(foldername, int2str(counter), 'T.mat');
-    load(filenameImgT);
+    filenameP = strcat(currentFoldername, int2str(counter), '_P.mat');
+    load(filenameP);
     
     P_cam(counter,:) = triangulatedPoints(counter, :);
     
-    P_tool_center_robot = T(1:3, 4)'; % take only last column - xyz
-    P_tool_center_robot(4) = 1; % make it homogenous
+    % P_tool_center is in robot's frame
+    P_tool_center = P(1:3, 4)'; % take only last column - xyz
+    P_tool_center(4) = 1; % make it homogenous
     
-    horizontal_Tf = eye(4);
-    horizontal_Tf(3,4) = 0.009; % measured from center of the circle as 9mm
-    % NOTE: above transform will change
+    tooltip_transform = eye(4);
     
-    transformed_point = horizontal_Tf * P_tool_center_robot';
+    % change z access - m
+    tooltip_transform(3,4) = tooltip_offset; % measured from center of the circle as 9mm
     
+    transformed_point = tooltip_transform * P_tool_center';
+    
+    % this is the tool-tip
     P_robot(counter, 1:3) = transformed_point(1:3);
     
-    % TODO add transformation
 end
 
 % use horns method to compute 3d transform

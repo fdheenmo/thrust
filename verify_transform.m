@@ -4,10 +4,10 @@
 load('computed_transform.mat')
 load('config_file.mat')
 
-matchedPointsFile = strcat(foldername, 'matchedPoints.mat');
+matchedPointsFile = strcat(currentFoldername, 'matchedPoints.mat');
 load(matchedPointsFile);
 
-triangulatedPointsFile = strcat(foldername,'triangulatedPoints.mat');
+triangulatedPointsFile = strcat(currentFoldername,'triangulatedPoints.mat');
 load(triangulatedPointsFile);
 
 sum_error = 0;
@@ -17,16 +17,27 @@ showPlot = true;
 
 for counter = 1:n_stereo_pairs
     
-    filenameImgL = strcat(foldername, int2str(counter), 'L.jpg');
-    filenameImgR = strcat(foldername, int2str(counter), 'R.jpg');
+    filenameImgL = strcat(currentFoldername, int2str(counter), '_L.jpg');
+    filenameImgR = strcat(currentFoldername, int2str(counter), '_R.jpg');
     
-    filenameImgT = strcat(foldername, int2str(counter), 'T.mat');
-    load(filenameImgT);
+    filenameP = strcat(currentFoldername, int2str(counter), '_P.mat');
+    load(filenameP);
     
+    % this is the tool-axis
+    P_tool_center = P(1:3, 4);
     
-    P_robot = T(1:3, 4); % T is point from file
+    tooltip_transform = eye(4);
     
-    % transform point
+    % change z access - m
+    tooltip_transform(3,4) = tooltip_offset;
+    
+    transformed_point = tooltip_transform * P_tool_center';
+    
+    % this is the tool-tip
+    P_robot(1:3) = transformed_point(1:3);
+
+    
+    % transform point from robot to camera frame
     P_cam(1:3) = R * P_robot(1:3) + t(1:3);
     P_cam(4) = 1;
     
@@ -38,8 +49,8 @@ for counter = 1:n_stereo_pairs
         pixelL = cameraMatrixL * P_cam';
         pixelR = cameraMatrixR * P_cam';
         
-        pixelL = pixelL ./ pixelL(3)
-        pixelR = pixelR ./ pixelR(3)
+        pixelL = pixelL ./ pixelL(3);
+        pixelR = pixelR ./ pixelR(3);
         
         
         I = imread(filenameImgL);

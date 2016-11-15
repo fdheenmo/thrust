@@ -1,21 +1,16 @@
 % This script will display the video stream and record the images and
 % kinematic at a given time using mouse clicks
 
-% rosrun image_view image_view image:=/stereo/left/image_rect_color
+clc; clear variables; close all;
+
 load('config_file.mat')
 
-
-foldername = datestr(now, 'dd-mmm-HH-MM-SS');
-mkdir(foldername);
-
-% declare topic names and create subscribers
-leftImageTopic = '/stereo/left/image_rect_color/compressed';
-rightImageTopic = '/stereo/right/image_rect_color/compressed';
-transformTopic = '/dvrk/PSM2/position_cartesian_current';
+recordFoldername = datestr(now, 'dd-mmm-HH-MM-SS');
+mkdir(recordFoldername);
 
 subL = rossubscriber(leftImageTopic);
 subR = rossubscriber(rightImageTopic);
-subT = rossubscriber(transformTopic);
+subP = rossubscriber(poseTopic);
 
 for counter = 1:n_stereo_pairs
     
@@ -26,16 +21,16 @@ for counter = 1:n_stereo_pairs
     msgL = receive(subL);
     msgR = receive(subR);
     
+    % fetch 4x4 pose matrix
+    msgT = receive(subP, 1); % second value is timeout
+    
     imgL = readImage(msgL);
     imgR = readImage(msgR);
-    
-    % fetch 4x4 transformation matrix
-    msgT = receive(subT, 1); % second value is timeout
-    
+        
     % gen filesnames
-    filenameL = strcat(foldername, '/', int2str(counter), 'L.jpg');
-    filenameR = strcat(foldername, '/', int2str(counter), 'R.jpg');
-    filenameT = strcat(foldername, '/', int2str(counter), 'T.mat');
+    filenameL = strcat(recordFoldername, '/', int2str(counter), '_L.jpg');
+    filenameR = strcat(recordFoldername, '/', int2str(counter), '_R.jpg');
+    filenameP = strcat(recordFoldername, '/', int2str(counter), '_P.mat');
     
     % save images
     imwrite(imgL, filenameL);
@@ -46,22 +41,21 @@ for counter = 1:n_stereo_pairs
     rosQuaternion = msgT.Pose.Orientation;
     
     quaternion = [rosQuaternion.W rosQuaternion.X rosQuaternion.Y rosQuaternion.Z];
-    position = [rosPosition.X rosPosition.Y rosPosition.Z];
+    positionVector = [rosPosition.X rosPosition.Y rosPosition.Z];
     
-    rotm = quat2rotm(quaternion);
+    rotationMatrix = quat2rotm(quaternion);
     
     % generate 6d0f transform matrix
-    T = zeros(4,4);
-    T(1:3, 1:3) = rotm;
-    T(1:3, end) = position;
-    T(4,4) = 1;
-    
-    
-    % save transform matrix
-    save(filenameT,'T');
-    
-    fprintf('image+transform saved. %d images left\n', n_stereo_pairs-counter);
+    P = zeros(4,4);
+    P(1:3, 1:3) = rotationMatrix;
+    P(1:3, end) = positionVector;
+    P(4,4) = 1;
         
+    % save pose matrix of tooltip origin
+    save(filenameP,'P');
+    
+    fprintf('image+transform saved. %d image pairs left\n', n_stereo_pairs-counter);
 end
+
 fprintf('\n%d images saved!\n', n_stereo_pairs);
 close all;

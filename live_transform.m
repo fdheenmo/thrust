@@ -5,11 +5,6 @@
 load('config_file.mat')
 load('computed_transform.mat')
 
-% declare topic names and create subscribers
-leftImageTopic = '/stereo/left/image_rect_color/compressed';
-rightImageTopic = '/stereo/right/image_rect_color/compressed';
-poseTopic = '/dvrk/PSM2/position_cartesian_current';
-
 subL = rossubscriber(leftImageTopic);
 subR = rossubscriber(rightImageTopic);
 subP = rossubscriber(poseTopic);
@@ -28,15 +23,8 @@ while 1
     imgR = readImage(msgR);
     
     % get PoseStamped message and extract deets
-    rosPosition = msgP.Pose.Position;
-    rosQuaternion = msgP.Pose.Orientation;
-    
-    quaternion = [rosQuaternion.W rosQuaternion.X rosQuaternion.Y rosQuaternion.Z];
+    rosPosition = msgP.Pose.Position;   
     position = [rosPosition.X rosPosition.Y rosPosition.Z];
-    
-    rotm = quat2rotm(quaternion);
-    
-    
     
     % generate 3d0f position vector
     P_tool_center_robot = zeros(4,1);

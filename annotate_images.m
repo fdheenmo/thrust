@@ -1,18 +1,17 @@
 % This script opens the image files, shows them side by side and allows
 % user to annotate pics
-load('config_file.mat')
 
+clc; clear variables; close all;
+
+load('config_file.mat')
 
 matchedPointsL = zeros(n_stereo_pairs,2);
 matchedPointsR = zeros(n_stereo_pairs,2);
 
-foldername = 'current_images/';
-
-
 for counter = 1:n_stereo_pairs
     
-    filenameImgL = strcat(foldername, int2str(counter), 'L.jpg');
-    filenameImgR = strcat(foldername, int2str(counter), 'R.jpg');
+    filenameImgL = strcat(currentFoldername, int2str(counter), '_L.jpg');
+    filenameImgR = strcat(currentFoldername, int2str(counter), '_R.jpg');
     
     I = imread(filenameImgL);
     imshow(I);
@@ -25,11 +24,12 @@ for counter = 1:n_stereo_pairs
     [xr, yr] = ginput(1);
     matchedPointsR(counter, :) = [xr, yr];
     
-    disp('One pair of images done');
-    
-    
+    fprintf('One image pair annotated. %d image pairs left\n', n_stereo_pairs-counter);
 end
 
 % save all the 2D points
-saveFile = strcat(foldername, 'matchedPoints.mat');
+saveFile = strcat(currentFoldername, 'matchedPoints.mat');
 save(saveFile,'matchedPointsL', 'matchedPointsR');
+
+fprintf('All matchedPoints saved!\n', n_stereo_pairs);
+close all;
