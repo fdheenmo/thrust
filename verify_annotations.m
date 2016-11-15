@@ -3,14 +3,8 @@
 
 load('config_file.mat')
 
-matchedPointsL = zeros(n_stereo_pairs,2);
-matchedPointsR = zeros(n_stereo_pairs,2);
-
-
 saveFile = strcat(foldername, 'matchedPoints.mat');
 load(saveFile);
-
-radius = 5;
 
 for counter = 1:n_stereo_pairs
     
@@ -27,8 +21,8 @@ for counter = 1:n_stereo_pairs
     
     t=0:0.1:2*pi;
     %x_o and y_o = center of circle
-    x = xl + radius*sin(t);
-    y = yl + radius*cos(t);
+    x = xl + r_plot*sin(t);
+    y = yl + r_plot*cos(t);
     fill(x,y,'r');
     hold off;
     
@@ -40,8 +34,8 @@ for counter = 1:n_stereo_pairs
     P = matchedPointsR(counter, :);
     xr = P(1);
     yr = P(2);
-    x = xr + radius*sin(t);
-    y = yr + radius*cos(t);
+    x = xr + r_plot*sin(t);
+    y = yr + r_plot*cos(t);
     fill(x,y,'r');
     hold off;
     

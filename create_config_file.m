@@ -12,8 +12,13 @@ cameraMatrixR = ...
 
 foldername = 'current_images/';
 
+% for plotting
+t_plot=0:0.1:2*pi;
+r_plot = 5; % radius of the plotted circles
 
-save('config_file.mat', 'n_stereo_pairs', 'cameraMatrixL', 'cameraMatrixR', ...
-    'foldername');
+
+
+save('config_file.mat');
 
 clc; close all;
+

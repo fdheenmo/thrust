@@ -21,7 +21,7 @@ for counter = 1:n_stereo_pairs
     P_tool_center_robot(4) = 1; % make it homogenous
     
     horizontal_Tf = eye(4);
-    horizontal_Tf(1,4) = 0.009; % measured from center of the circle as 9mm
+    horizontal_Tf(3,4) = 0.009; % measured from center of the circle as 9mm
     % NOTE: above transform will change
     
     transformed_point = horizontal_Tf * P_tool_center_robot';
