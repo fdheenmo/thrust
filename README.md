@@ -1,3 +1,10 @@
+# Stereo Tracking for da Vinci surgical robot
+Feroze Naina
+
+## Installation
+Clone repository and open directory in MATLAB
+
+## Usage
 Step 1: Record data
 Run live_record.m to store files
 Copy files from inside the timestamped folder
