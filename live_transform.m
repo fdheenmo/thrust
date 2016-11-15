@@ -36,14 +36,23 @@ while 1
     
     rotm = quat2rotm(quaternion);
     
+    
+    
     % generate 3d0f position vector
-    P_robot = zeros(4,1);
-    P_robot(4,1) = 1;
+    P_tool_center_robot = zeros(4,1);
+    P_tool_center_robot(4,1) = 1;
     
-    P_robot(1:3, 1) = position;
+    P_tool_center_robot(1:3, 1) = position;
     
+    horizontal_Tf = eye(4);
+    horizontal_Tf(3,4) = 0.009; % measured from center of the circle as 9mm
+    % NOTE: above transform will change
+    
+    transformed_point = horizontal_Tf * P_tool_center_robot;
+    
+       
     % transform point
-    P_cam(1:3) = R * P_robot(1:3) + t(1:3);
+    P_cam(1:3) = R * transformed_point(1:3) + t(1:3);
     P_cam(4) = 1;
     
     % now convert P_cam back into the L and R frame
@@ -53,7 +62,7 @@ while 1
     pixelL = pixelL ./ pixelL(3);
     pixelR = pixelR ./ pixelR(3);
     
-%     subplot(1, 2, 1);
+    %     subplot(1, 2, 1);
     figure(1);
     imshow(imgL);
     hold on;
@@ -62,13 +71,13 @@ while 1
     fill(x,y,'y');
     hold off;
     
-%     subplot(1, 2, 2);
+    %     subplot(1, 2, 2);
     figure(2);
     imshow(imgR);
     hold on;
     x = pixelR(1) + r_plot*sin(t_plot);
     y = pixelR(2) + r_plot*cos(t_plot);
-    fill(x,y,'y');    
+    fill(x,y,'y');
     hold off;
     
 end
