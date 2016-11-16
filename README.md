@@ -29,3 +29,6 @@ verify_transform.m - Projects the 3D point back into RL camera frames using Tf c
 - Easier way to collect data.
 - Modular way to annotate or retake annotations without discarding entire 
 - correct position transform to include the displacement to tip
+
+## DEMO
+<iframe width="560" height="315" src="https://www.youtube.com/embed/FlU17NmXGSs" frameborder="0" allowfullscreen></iframe>
