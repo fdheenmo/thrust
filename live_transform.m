@@ -1,6 +1,6 @@
 % open video feed
 
-% draw circles every often
+clc; clear variables; close all;
 
 load('config_file.mat')
 load('computed_transform.mat')
