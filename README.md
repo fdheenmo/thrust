@@ -21,18 +21,14 @@ Run triangulate_points.m
 compute_transform.m - does least squares computation to determine Tf between camera frame and robot frame
 verify_transform.m - Projects the 3D point back into RL camera frames using Tf computed above
 
-TODO:
-When computing transform, just use all the files in the folder which have same name and L,R,T suffixes.
-Add the displacement into the equation
-Validate transform
-Fix colorbalance
-Easier way to collect data.
-Modular way to annotate or retake annotations without discarding entire 
+## TODO
+- When computing transform, just use all the files in the folder which have same name and L,R,T suffixes.
+- Add the displacement into the equation
+- Validate transform
+- Fix colorbalance
+- Easier way to collect data.
+- Modular way to annotate or retake annotations without discarding entire 
+- correct position transform to include the displacement to tip
 
-MISSING BLOCKS:
-correct Least squares
-correct position transform to include the displacement to tip
-
-SLICES:
-compute_transform - Fix least squares - use toolbox
-Recalibrate using checkerboard and the stereo calibration toolbox
+## DEMO
+<iframe width="560" height="315" src="https://www.youtube.com/embed/FlU17NmXGSs" frameborder="0" allowfullscreen></iframe>
