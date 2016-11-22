@@ -13,7 +13,7 @@ load(triangulatedPointsFile);
 
 sum_error = 0;
 
-showPlot = true;
+showPlot = false;
 
 
 for counter = 1:n_stereo_pairs
@@ -22,22 +22,17 @@ for counter = 1:n_stereo_pairs
     filenameImgR = strcat(currentFoldername, int2str(counter), '_R.jpg');
     
     filenameP = strcat(currentFoldername, int2str(counter), '_P.mat');
-    load(filenameP);
-    
-    % this is the tool-axis
-    P_tool_center = P(1:3, 4);
-    P_tool_center(4) = 1;
-    
+    load(filenameP);  
     
     tooltip_transform = eye(4);
     
     % change z access - m
     tooltip_transform(3,4) = tooltip_offset;
     
-    transformed_point = tooltip_transform * P_tool_center;
+    transformed_point = P * tooltip_transform;
     
     % this is the tool-tip
-    P_robot(1:3) = transformed_point(1:3);
+    P_robot(1:3) = transformed_point(1:3, 4);
     
     
     % transform point from robot to camera frame

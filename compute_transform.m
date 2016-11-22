@@ -16,20 +16,16 @@ for counter = 1:n_stereo_pairs
     load(filenameP);
     
     P_cam(counter,:) = triangulatedPoints(counter, :);
-    
-    % P_tool_center is in robot's frame
-    P_tool_center = P(1:3, 4)'; % take only last column - xyz
-    P_tool_center(4) = 1; % make it homogenous
-    
+       
     tooltip_transform = eye(4);
     
     % change z access - m
     tooltip_transform(3,4) = tooltip_offset; % measured from center of the circle as 9mm
     
-    transformed_point = tooltip_transform * P_tool_center';
+    transformed_point = P * tooltip_transform;
     
     % this is the tool-tip
-    P_robot(counter, 1:3) = transformed_point(1:3);
+    P_robot(counter, 1:3) = transformed_point(1:3, 4);
     
 end
 

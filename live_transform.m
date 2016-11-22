@@ -41,7 +41,7 @@ while 1
     tooltip_transform(3,4) = tooltip_offset; % measured from center of the circle as 9mm
     % NOTE: above transform will change
     
-    transformed_pose = tooltip_transform * P_tool_center;
+    transformed_pose = P_tool_center * tooltip_transform;
     
     P_robot = transformed_pose(1:3,4);
     
