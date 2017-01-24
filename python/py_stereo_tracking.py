@@ -16,6 +16,9 @@ from cv_bridge import CvBridge, CvBridgeError
 from IPython import embed
 import numpy, scipy.io
 
+import tf.transformations
+
+
 class MyWindow(QtGui.QMainWindow):
     def __init__(self):
         super(MyWindow, self).__init__()
@@ -194,8 +197,31 @@ class MyWindow(QtGui.QMainWindow):
     def pose_callback(self, data):
         # print "callback"
         # perform tooltip offset
-        self.current_position = data.pose.position
-        # embed()
+        quaternion = (
+            data.pose.orientation.x,
+            data.pose.orientation.y,
+            data.pose.orientation.z,
+            data.pose.orientation.w)
+
+        position = (
+            data.pose.position.x,
+            data.pose.position.y,
+            data.pose.position.z,
+
+        current_pose = np.identity(4)
+        current_pose[0:3, 3] = np.transpose([position[0],
+            position[1], position[2])
+
+        rot_matrix = tf.transformations.quaternion_matrix(quaternion)
+
+        current_pose[0:3, 0:3] = rot_matrix[0:3, 0:3]
+
+        tooltip_transform = np.identity(4)
+
+        current_pose = np.dot(current_pose, tooltip_transform)
+
+        # return only the xyz position
+        self.current_position = self.current_pose[0:3, 3]
 
     def updateLeftSlot(self):
 
@@ -291,8 +317,8 @@ class MyWindow(QtGui.QMainWindow):
 
     def horns_method(self, q, p):
 
-        p_bar = np.mean(p)
-        q_bar = np.mean(q) 
+        p_bar = np.mean(p, axis=0)
+        q_bar = np.mean(q, axis=0) 
 
         # # % find data centroid and deviations from centroid
 
@@ -307,8 +333,8 @@ class MyWindow(QtGui.QMainWindow):
         U, s, V = np.linalg.svd(N, full_matrices=True) # singular value decomposition
 
         R =  V * np.transpose(U);
+        t = np.transpose(q_bar) - np.dot(R, np.transpose(p_bar))
 
-        t = np.transpose(q_bar) - R * np.transpose(p_bar)
 
         return R, t
 
