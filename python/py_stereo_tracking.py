@@ -70,13 +70,13 @@ class MyWindow(QtGui.QMainWindow):
         self.ui.show()
 
         self.ui.hSlider.setValue(0);
-        self.ui.sMinSlider.setValue(133);
-        self.ui.vMinSlider.setValue(207);
+        self.ui.sMinSlider.setValue(67);
+        self.ui.vMinSlider.setValue(135);
         self.ui.vMaxSlider.setValue(255);
 
         self.ui.hSpinBox.setValue(0);
-        self.ui.sMinSpinBox.setValue(133);
-        self.ui.vMinSpinBox.setValue(207);
+        self.ui.sMinSpinBox.setValue(67);
+        self.ui.vMinSpinBox.setValue(135);
         self.ui.vMaxSpinBox.setValue(255);
 
         self.recorded_kinematic_positions = np.empty((0,3))
@@ -146,6 +146,8 @@ class MyWindow(QtGui.QMainWindow):
         self.R = inp['R']
         self.t = inp['t']
         print "transform loaded"
+        self.ui.validateTransformPushButton.setEnabled(True)
+        self.transform_loaded = True
 
     def showSegmentedCallback(self, state):
         if state:
@@ -297,13 +299,16 @@ class MyWindow(QtGui.QMainWindow):
 
     def updateErrorSlot(self):
         # compute error
+        print "updateErrorSlot called"
         p_robot = self.current_bulbcenter_position
         tfp_camera = np.dot(self.R, p_robot) + self.t
 
-        p_camera = self.recorded_stereo_positions[-1]
+        p_camera = self.current_stereo_position
 
-        error = np.linalg.norm(tfp_camera, p_camera)
-        self.ui.currentErrorLineEdit.setValue(error)
+        print tfp_camera.shape, p_camera.shape
+
+        error = np.linalg.norm(tfp_camera - p_camera)
+        self.ui.currentErrorLineEdit.setText(str(error * 1000))
 
     def validateTransformCallback(self):
         self.emit(SIGNAL("updateError"))
@@ -319,6 +324,9 @@ class MyWindow(QtGui.QMainWindow):
         # convI = self.bridge.cv2_to_imgmsg(self.segmentedL, "mono8")
 
         self.emit(SIGNAL("updateLeft"))
+
+        if self.transform_loaded:
+            self.emit(SIGNAL("updateError"))
 
 
     def image_r_callback(self,data):
@@ -339,9 +347,13 @@ class MyWindow(QtGui.QMainWindow):
         centerL = self.get_centroid(self.segmentedL)
         centerR = self.get_centroid(self.segmentedR)
 
+        a = (self.cam_model.projectPixelTo3d(centerL,centerL[0] - centerR[0]))
+
+        if(centerL != None and centerR != None):
+            self.current_stereo_position = np.array([[a[0], a[1], a[2]]])
+
         if(centerL != None and centerR != None and self.recording):
             # print(self.cam_model.projectPixelTo3d(centerL,centerL[0] - centerR[0]))
-            a = (self.cam_model.projectPixelTo3d(centerL,centerL[0] - centerR[0]))
 
             self.recorded_stereo_positions = np.append(self.recorded_stereo_positions, 
                     np.array([[ a[0], a[1], a[2]]]), axis = 0)
