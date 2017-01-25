@@ -78,6 +78,8 @@ class MyWindow(QtGui.QMainWindow):
 
         self.recorded_kinematic_positions = np.empty((0,3))
         self.recorded_stereo_positions = np.empty((0,3))
+        self.recorded_toolcenter_poses = np.empty((4,4))
+
 
         self.counter = 0
         self.recording = False
@@ -96,9 +98,12 @@ class MyWindow(QtGui.QMainWindow):
         self.ui.generateTransformPushButton.setEnabled(True)
 
     def exportPointsCallback(self):
+
         scipy.io.savemat('recorded_data.mat',
                 mdict={'recorded_stereo_positions':self.recorded_stereo_positions,
                     'recorded_kinematic_positions': self.recorded_kinematic_positions})
+
+
         print "file saved"
 
     def importPointsCallback(self):
@@ -113,13 +118,16 @@ class MyWindow(QtGui.QMainWindow):
         self.ui.generateTransformPushButton.setEnabled(False)
         self.ui.saveTransformPushButton.setEnabled(True)
 
-        R, t = self.horns_method(self.recorded_stereo_positions, self.recorded_kinematic_positions)
+        self.R, self.t = self.horns_method(self.recorded_stereo_positions, self.recorded_kinematic_positions)
 
-        print "R value is" , R
-        print "t value is" , t
+        print "R value is" , self.R
+        print "t value is" , self.t
 
     def saveTransformCallback(self):
-        pass
+        scipy.io.savemat('transform.mat',
+            mdict={'R': self.R, 't': self.t})
+        print "transform saved"
+
 
     def showSegmentedCallback(self, state):
         if state:
@@ -206,22 +214,23 @@ class MyWindow(QtGui.QMainWindow):
         position = (
             data.pose.position.x,
             data.pose.position.y,
-            data.pose.position.z,
+            data.pose.position.z)
 
-        current_pose = np.identity(4)
-        current_pose[0:3, 3] = np.transpose([position[0],
-            position[1], position[2])
+        self.toolcenter_pose = np.identity(4)
+        self.toolcenter_pose[0:3, 3] = np.transpose([position[0],
+            position[1], position[2]])
 
         rot_matrix = tf.transformations.quaternion_matrix(quaternion)
 
-        current_pose[0:3, 0:3] = rot_matrix[0:3, 0:3]
+        self.toolcenter_pose[0:3, 0:3] = rot_matrix[0:3, 0:3]
 
         tooltip_transform = np.identity(4)
+        tooltip_transform[2,3] = 0.0013 # tool center is 13mm from the bulb
 
-        current_pose = np.dot(current_pose, tooltip_transform)
+        current_pose = np.dot(self.toolcenter_pose, tooltip_transform)
 
         # return only the xyz position
-        self.current_position = self.current_pose[0:3, 3]
+        self.current_bulbcenter_position = current_pose[0:3, 3]
 
     def updateLeftSlot(self):
 
@@ -289,7 +298,7 @@ class MyWindow(QtGui.QMainWindow):
             print "right not working"
             print e
 
-        stored_position = self.current_position #todo verify sync
+        stored_position = self.current_bulbcenter_position #todo verify sync
 
         self.segmentedR = self.segment(self.imageR)
         # convI = self.bridge.cv2_to_imgmsg(self.segmentedR, "mono8")
@@ -307,8 +316,10 @@ class MyWindow(QtGui.QMainWindow):
                     np.array([[ a[0], a[1], a[2]]]), axis = 0)
 
             self.recorded_kinematic_positions = np.append(self.recorded_kinematic_positions, 
-                    np.array([[ stored_position.x, stored_position.y, stored_position.z]]), axis = 0)
-            # print self.recorded_kinematic_positions
+                    np.array([[ stored_position[0], stored_position[1], stored_position[2]]]), axis = 0)
+
+            #self.recorded_toolcenter_poses = np.append(self.recorded_toolcenter_poses, 
+            #        self.toolcenter_pose, axis = 2)
 
             self.counter = self.counter + 1
 
