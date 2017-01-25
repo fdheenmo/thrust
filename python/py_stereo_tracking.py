@@ -225,7 +225,7 @@ class MyWindow(QtGui.QMainWindow):
         self.toolcenter_pose[0:3, 0:3] = rot_matrix[0:3, 0:3]
 
         tooltip_transform = np.identity(4)
-        tooltip_transform[2,3] = 0.0013 # tool center is 13mm from the bulb
+        tooltip_transform[2,3] = 0.013 # tool center is 13mm from the bulb
 
         current_pose = np.dot(self.toolcenter_pose, tooltip_transform)
 
