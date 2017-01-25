@@ -14,7 +14,7 @@ from geometry_msgs.msg import PoseStamped
 from sensor_msgs.msg import CameraInfo
 from cv_bridge import CvBridge, CvBridgeError
 from IPython import embed
-import numpy, scipy.io
+import scipy.io
 
 import tf.transformations
 
@@ -339,13 +339,12 @@ class MyWindow(QtGui.QMainWindow):
         p_mark = p - p_bar
         # # % Apply weights
 
-        N = np.dot(np.transpose(p_mark), q_mark) # taking points of q in matched order
+        N = np.dot(p_mark.T, q_mark) # taking points of q in matched order
 
         U, s, V = np.linalg.svd(N, full_matrices=True) # singular value decomposition
 
-        R =  V * np.transpose(U);
-        t = np.transpose(q_bar) - np.dot(R, np.transpose(p_bar))
-
+        R =  np.dot(V.T, U.T);
+        t = q_bar.T - np.dot(R, p_bar.T)
 
         return R, t
 
