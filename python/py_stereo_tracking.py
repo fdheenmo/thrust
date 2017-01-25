@@ -58,11 +58,14 @@ class MyWindow(QtGui.QMainWindow):
         self.ui.exportPointsPushButton.clicked.connect(self.exportPointsCallback)
         self.ui.generateTransformPushButton.clicked.connect(self.generateTransformCallback)
         self.ui.saveTransformPushButton.clicked.connect(self.saveTransformCallback)
+        self.ui.loadTransformPushButton.clicked.connect(self.loadTransformCallback)
+        self.ui.validateTransformPushButton.clicked.connect(self.validateTransformCallback)
         self.ui.showSegmentedCheckBox.stateChanged.connect(self.showSegmentedCallback)
         self.ui.importPointsPushButton.clicked.connect(self.importPointsCallback)
 
         self.connect(self, SIGNAL("updateLeft"), self.updateLeftSlot)
         self.connect(self, SIGNAL("updateRight"), self.updateRightSlot)
+        self.connect(self, SIGNAL("updateError"), self.updateErrorSlot)
 
         self.ui.show()
 
@@ -84,6 +87,7 @@ class MyWindow(QtGui.QMainWindow):
         self.counter = 0
         self.recording = False
         self.show_segmented = True 
+        self.transform_loaded = False
 
     def startRecordingCallback(self):
         self.ui.stopRecordingPushButton.setEnabled(True)
@@ -99,9 +103,14 @@ class MyWindow(QtGui.QMainWindow):
 
     def exportPointsCallback(self):
 
+        arranged_recorded_toolcenter_poses = np.vsplit(self.recorded_toolcenter_poses,
+                self.recorded_toolcenter_poses.shape[0]/4)
+
         scipy.io.savemat('recorded_data.mat',
                 mdict={'recorded_stereo_positions':self.recorded_stereo_positions,
-                    'recorded_kinematic_positions': self.recorded_kinematic_positions})
+                    'recorded_kinematic_positions': self.recorded_kinematic_positions,
+                    'recorded_toolcenter_poses': self.recorded_toolcenter_poses,
+                    'arranged_recorded_toolcenter_poses': arranged_recorded_toolcenter_poses})
 
 
         print "file saved"
@@ -123,11 +132,20 @@ class MyWindow(QtGui.QMainWindow):
         print "R value is" , self.R
         print "t value is" , self.t
 
+        self.ui.validateTransformPushButton.setEnabled(True)
+        self.ui.loadTransformPushButton.setEnabled(False)
+        self.transform_loaded = True
+
     def saveTransformCallback(self):
         scipy.io.savemat('transform.mat',
             mdict={'R': self.R, 't': self.t})
         print "transform saved"
 
+    def loadTransformCallback(self):
+        inp = scipy.io.loadmat('transform.mat')
+        self.R = inp['R']
+        self.t = inp['t']
+        print "transform loaded"
 
     def showSegmentedCallback(self, state):
         if state:
@@ -210,6 +228,7 @@ class MyWindow(QtGui.QMainWindow):
             data.pose.orientation.y,
             data.pose.orientation.z,
             data.pose.orientation.w)
+        rot_matrix = tf.transformations.quaternion_matrix(quaternion)
 
         position = (
             data.pose.position.x,
@@ -217,20 +236,18 @@ class MyWindow(QtGui.QMainWindow):
             data.pose.position.z)
 
         self.toolcenter_pose = np.identity(4)
+
         self.toolcenter_pose[0:3, 3] = np.transpose([position[0],
             position[1], position[2]])
-
-        rot_matrix = tf.transformations.quaternion_matrix(quaternion)
-
         self.toolcenter_pose[0:3, 0:3] = rot_matrix[0:3, 0:3]
 
         tooltip_transform = np.identity(4)
         tooltip_transform[2,3] = 0.013 # tool center is 13mm from the bulb
 
-        current_pose = np.dot(self.toolcenter_pose, tooltip_transform)
+        current_bulbcenter_pose = np.dot(self.toolcenter_pose, tooltip_transform)
 
         # return only the xyz position
-        self.current_bulbcenter_position = current_pose[0:3, 3]
+        self.current_bulbcenter_position = current_bulbcenter_pose[0:3, 3]
 
     def updateLeftSlot(self):
 
@@ -278,6 +295,19 @@ class MyWindow(QtGui.QMainWindow):
         scene.addItem(pixMapItem)
         self.ui.rightGraphicsView.setScene(scene)
 
+    def updateErrorSlot(self):
+        # compute error
+        p_robot = self.current_bulbcenter_position
+        tfp_camera = np.dot(self.R, p_robot) + self.t
+
+        p_camera = self.recorded_stereo_positions[-1]
+
+        error = np.linalg.norm(tfp_camera, p_camera)
+        self.ui.currentErrorLineEdit.setValue(error)
+
+    def validateTransformCallback(self):
+        self.emit(SIGNAL("updateError"))
+
     def imageL_callback(self,data):
         try:
             self.imageL = self.bridge.imgmsg_to_cv2(data, "bgr8")
@@ -299,6 +329,7 @@ class MyWindow(QtGui.QMainWindow):
             print e
 
         stored_position = self.current_bulbcenter_position #todo verify sync
+        stored_toolcenter_pose = self.toolcenter_pose #todo verify sync
 
         self.segmentedR = self.segment(self.imageR)
         # convI = self.bridge.cv2_to_imgmsg(self.segmentedR, "mono8")
@@ -318,8 +349,8 @@ class MyWindow(QtGui.QMainWindow):
             self.recorded_kinematic_positions = np.append(self.recorded_kinematic_positions, 
                     np.array([[ stored_position[0], stored_position[1], stored_position[2]]]), axis = 0)
 
-            #self.recorded_toolcenter_poses = np.append(self.recorded_toolcenter_poses, 
-            #        self.toolcenter_pose, axis = 2)
+            self.recorded_toolcenter_poses = np.append(self.recorded_toolcenter_poses, 
+                   stored_toolcenter_pose, axis = 0)
 
             self.counter = self.counter + 1
 
