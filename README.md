@@ -9,7 +9,7 @@ Clone repository and open directory in MATLAB
 Step 0: Start the da Vinci, run roslaunch dvrk_vtk_registration stereo_vision.launch 
 
 Step 1: Record data
-Run live_record.m to store files
+Run record_images.m to store files
 Copy files from inside the timestamped folder
 
 Step 3: Manually annotate images
