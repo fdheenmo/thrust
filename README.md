@@ -8,8 +8,8 @@ Clone repository and open directory in MATLAB
 
 Step 0: Start the da Vinci, run roslaunch dvrk_vtk_registration stereo_vision.launch 
 
-Step 1: Open create_config_file.m. Verify that the camera matrices, topics, file and directory names are correct. If a config_file.mat
-doesn't exist, run the script.
+Step 1: Open create_config_file.m. Verify that the camera matrices, topics, file and directory names are correct.
+If a config_file.mat doesn't exist, run the script.
 
 Step 2: Record data
 Run record_images.m to store files
