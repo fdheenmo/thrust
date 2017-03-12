@@ -11,21 +11,27 @@ matchedPointsR = zeros(n_stereo_pairs,2);
 for counter = 1:n_stereo_pairs
     
     filenameImgL = strcat(currentFoldername, int2str(counter), '_L.jpg');
-    filenameImgR = strcat(currentFoldername, int2str(counter), '_R.jpg');
     
     I = imread(filenameImgL);
     imshow(I);
     [xl, yl] = ginput(1);
     matchedPointsL(counter, :) = [xl, yl];
     
+    fprintf('One image annotated. %d images left\n', 2 * n_stereo_pairs-counter);
+end
+
+for counter = 1:n_stereo_pairs
     
+    filenameImgR = strcat(currentFoldername, int2str(counter), '_R.jpg');
+      
     I = imread(filenameImgR);
     imshow(I);
     [xr, yr] = ginput(1);
     matchedPointsR(counter, :) = [xr, yr];
     
-    fprintf('One image pair annotated. %d image pairs left\n', n_stereo_pairs-counter);
+    fprintf('One image annotated. %d images left\n', n_stereo_pairs-counter);
 end
+
 
 % save all the 2D points
 saveFile = strcat(currentFoldername, 'matchedPoints.mat');

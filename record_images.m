@@ -4,6 +4,7 @@
 clc; clear variables; close all;
 
 load('config_file.mat')
+load audio % audio.mat for sound
 
 recordFoldername = datestr(now, 'dd-mmm-HH-MM-SS');
 mkdir(recordFoldername);
@@ -55,7 +56,10 @@ for counter = 1:n_stereo_pairs
     save(filenameP,'P');
     
     fprintf('image+transform saved. %d image pairs left\n', n_stereo_pairs-counter);
+    play(Audio)
 end
 
 fprintf('\n%d images saved!\n', n_stereo_pairs);
+play(EndAudio)
+
 close all;

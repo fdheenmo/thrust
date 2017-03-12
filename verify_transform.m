@@ -15,6 +15,7 @@ sum_error = 0;
 
 showPlot = false;
 
+errors = [];
 
 for counter = 1:n_stereo_pairs
     
@@ -41,6 +42,7 @@ for counter = 1:n_stereo_pairs
     
     error = pdist2(triangulatedPoints(counter, :), P_cam(1:3));
     sum_error = sum_error + error;
+    errors= [errors; error];
     
     if showPlot
         % now convert P_cam back into the L and R frame
@@ -96,4 +98,5 @@ end
 mean_error = sum_error / n_stereo_pairs;
 fprintf('Mean error = %d\n', mean_error);
 
-close all;
+errors_mm = errors * 1000;
+ploterrhist(errors_mm)

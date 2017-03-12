@@ -32,7 +32,9 @@ end
 % use horns method to compute 3d transform
 [R,t] = horns_method(P_cam,P_robot);
 
-save('computed_transform.mat', 'R', 't')
-disp('Transformed computed and saved');
+save('computed_transform.mat', 'R', 't');
 
 clc; clear all; close all;
+
+disp('Transformed computed and saved');
+

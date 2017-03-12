@@ -1,6 +1,6 @@
 clc; clear variables; close all;
 
-n_stereo_pairs = 50;
+n_stereo_pairs = 23;
 
 % stereo parameters
 
@@ -14,7 +14,7 @@ cameraMatrixR = ...
     0, 572.2248516229374, 239.291540145874, 0; 
     0, 0, 1, 0];
 
-currentFoldername = 'current_images/';
+currentFoldername = 'mar-12-10am-images/';
 
 % for plotting
 t_plot=0:0.1:2*pi;
